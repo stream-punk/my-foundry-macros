@@ -12,6 +12,9 @@ Hooks.on("updateJournalEntry", async function(document, change, options, userId)
     if(userId != game.user.data._id) {
         return;
     }
+    if(change.name == undefined && change.content == undefined) {
+        return;
+    }
     let folder = document.folder.data.name.normalize();
     let info = folder.slice(2, _spAspectMarkerLen * -1).trim();
     let text = `<p><b>${info}: ${document.data.name}</b></p><p>${document.data.content}</p>`
