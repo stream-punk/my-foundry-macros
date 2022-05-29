@@ -22,7 +22,7 @@ function _spChatAspectChange(document, data) {
     if(ddata.name == name && ddata.content == content) {
         return;
     }
-    _spChatAspect(document, name, content);
+    return _spChatAspect(document, name, content);
 }
 
 function _spChatAspect(document, name, content) {
@@ -41,16 +41,19 @@ function _spChatAspect(document, name, content) {
             speaker: ChatMessage.getSpeaker({user: game.user}),
             content: text
         });
+        return true;
     }
+    return false;
 }
 
 Hooks.on("preUpdateJournalEntry", async function(document, change, options, userId) {
-    if(change.permission) {
-        change.permission.default = 3;
-    } else {
-        change.permission = {default: 3};
+    if(_spChatAspectChange(document, change)) {
+        if(change.permission) {
+            change.permission.default = 3;
+        } else {
+            change.permission = {default: 3};
+        }
     }
-    _spChatAspectChange(document, change);
 });
 
 Hooks.on("closeJournalSheet", async function(app, html) {
@@ -58,10 +61,11 @@ Hooks.on("closeJournalSheet", async function(app, html) {
     let data = document.data;
     if(!document.getFlag("my-foundry-macros", "logged")) {
         if(!data.content) {
-            _spChatAspect(document, data.name, data.content);
+            if(_spChatAspect(document, data.name, data.content)) {
+                document.update({permission: {default: 3}});
+            }
         }
     }
-    document.update({permission: {default: 3}});
     document.setFlag("my-foundry-macros", "logged", true);
 });
 
