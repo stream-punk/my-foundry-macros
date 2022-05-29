@@ -8,13 +8,8 @@ Hooks.once('ready', async function() {
 const _spRegex = /^\d+\s+/i;
 let _spAspectMarker = "📖".normalize();
 let _spAspectMarkerLen = _spAspectMarker.length
-function _spChatAspect(document, data, userId) {
-    if(!document.folder) {
-        return;
-    }
-    if(!document.folder.data) {
-        return;
-    }
+
+function _spChatAspectChange(document, data) {
     let ddata = document.data;
     let name = ddata.name;
     let content = ddata.content;
@@ -25,6 +20,16 @@ function _spChatAspect(document, data, userId) {
         content = data.content;
     }
     if(ddata.name == name && ddata.content == content) {
+        return;
+    }
+    _spChatAspect(document, name, content);
+}
+
+function _spChatAspect(document, name, content) {
+    if(!document.folder) {
+        return;
+    }
+    if(!document.folder.data) {
         return;
     }
     let folder = document.folder.data.name.normalize();
@@ -45,12 +50,23 @@ Hooks.on("preUpdateJournalEntry", async function(document, change, options, user
     } else {
         change.permission = {default: 3};
     }
-    _spChatAspect(document, change, userId);
+    _spChatAspectChange(document, change);
+});
+
+Hooks.on("closeJournalSheet", async function(app, html) {
+    let document = app.document;
+    let data = document.data;
+    if(!document.getFlag("my-foundry-macros", "logged")) {
+        if(!data.content) {
+            _spChatAspect(document, data.name, data.content);
+        }
+    }
+    document.update({permission: {default: 3}});
+    document.setFlag("my-foundry-macros", "logged", true);
 });
 
 Hooks.on("renderJournalSheet", async function(app, html, data) {
-    app.editors.content.button.onclick();
-    window.setTimeout(function() {
-        app.document.update({permission: {default: 3}});
-    }, 1000);
+    if(app.document.getFlag("my-foundry-macros", "logged")) {
+        app.editors.content.button.onclick();
+    }
 });
