@@ -1,0 +1,18 @@
+<table id="spRollDialogTable">
+    <tr>
+        <td>Fähigkeit</td>
+        <td>Bonus</td>
+        <td>Ziel</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><select name="spSkillSelect" id="spSkillSelect">
+            {{#each skills}}
+                <option value="{{this}}">{{this}}</option>
+            {{/each}}
+        </select></td>
+        <td><input maxlength="4" size="4" type="text" id="spBonusInput" name="spBonusInput"></td>
+        <td><input maxlength="4" size="4" type="text" id="spGoalInput" name="spGoalInput"></td>
+        <td><button id="spRollButton" type="button">Wurf</button></td>
+    </tr>
+</table>

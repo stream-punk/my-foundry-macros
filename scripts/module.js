@@ -41,6 +41,7 @@ function _spChatAspect(document, name, content) {
             speaker: ChatMessage.getSpeaker({user: game.user}),
             content: text
         });
+        document.setFlag("my-foundry-macros", "logged", true);
         return true;
     }
     return false;
@@ -66,7 +67,6 @@ Hooks.on("closeJournalSheet", async function(app, html) {
             }
         }
     }
-    document.setFlag("my-foundry-macros", "logged", true);
 });
 
 Hooks.on("renderJournalSheet", async function(app, html, data) {
